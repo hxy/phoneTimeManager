@@ -1,0 +1,228 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:toggle="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.phonetimemanager.activity.MainActivity" >
+
+    <LinearLayout
+        android:id="@+id/sleep_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:id="@+id/sleep_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/sleep"
+                android:textSize="@dimen/title_textsize" />
+
+            <com.zcw.togglebutton.ToggleButton
+                android:id="@+id/sleep_togglebutton"
+                android:layout_width="54dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true" >
+            </com.zcw.togglebutton.ToggleButton>
+        </RelativeLayout>
+    <LinearLayout
+        android:id="@+id/sleep_seter_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="#555">
+        <TextView
+            android:id="@+id/sleep_time"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="@dimen/sleep_time_marginTop"
+            android:text="07:30"
+            android:textSize="@dimen/sleep_time_textsize"/>
+
+        <LinearLayout
+            android:id="@+id/sleep_cycleLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/sleep_cycle_marginTop"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/mon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/monday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/tue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/tuesday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/wed"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/wednesday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/thu"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/thursday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/fri"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/friday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/sat"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="@dimen/sleep_weeks_marginRighe"
+                android:text="@string/saturday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+
+            <TextView
+                android:id="@+id/sun"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/sunday"
+                android:textSize="@dimen/sleep_cycle_textsize" />
+        </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="@dimen/middle_line_margin"
+        android:layout_marginTop="@dimen/middle_line_margin"
+        android:background="#000" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" >
+
+        <RelativeLayout
+            android:id="@+id/rest_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:text="@string/rest"
+                android:textSize="@dimen/title_textsize" />
+
+            <com.zcw.togglebutton.ToggleButton
+                android:id="@+id/rest_togglebutton"
+                android:layout_width="54dp"
+                android:layout_height="30dp"
+                android:layout_alignParentRight="true" >
+            </com.zcw.togglebutton.ToggleButton>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/rest_seter_height"
+            android:layout_marginTop="@dimen/rest_interval_marginTop" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:text="@string/rest_interval_time"
+                android:textSize="@dimen/rest_interval_textsize" />
+
+            <LinearLayout
+                android:id="@+id/rest_interval_seter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/rest_interval_edit"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:gravity="center"
+                    android:hint="50"
+                    android:textSize="@dimen/edit_textsize" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="分"
+                    android:textSize="@dimen/rest_interval_textsize" />
+            </LinearLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/rest_seter_height"
+            android:layout_marginTop="@dimen/rest_time_marginTop" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:text="@string/rest_time"
+                android:textSize="@dimen/rest_time_textsize" />
+
+            <LinearLayout
+                android:id="@+id/rest_time_seter"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentRight="true"
+                android:orientation="horizontal" >
+
+                <EditText
+                    android:id="@+id/rest_time_edit"
+                    android:layout_width="100dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/rounded_edittext"
+                    android:gravity="center"
+                    android:hint="50"
+                    android:textSize="@dimen/edit_textsize" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="分"
+                    android:textSize="@dimen/rest_time_textsize" />
+            </LinearLayout>
+        </RelativeLayout>
+    </LinearLayout>
+
+</LinearLayout>
