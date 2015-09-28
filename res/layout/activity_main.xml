@@ -223,6 +223,12 @@
                     android:textSize="@dimen/rest_time_textsize" />
             </LinearLayout>
         </RelativeLayout>
+        
+        <Button 
+            android:id="@+id/restAlarm_setBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="@string/set"/>
     </LinearLayout>
 
 </LinearLayout>

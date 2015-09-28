@@ -12,6 +12,7 @@ import com.phonetimemanager.service.ManagerService.MyBinder;
 import com.zcw.togglebutton.ToggleButton;
 import com.zcw.togglebutton.ToggleButton.OnToggleChanged;
 
+import android.R.integer;
 import android.app.Activity;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -30,9 +31,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -53,6 +56,9 @@ public class MainActivity extends Activity {
 	private AlarmManager alarmManager;
 	private SleepAlarm sleepAlarm;
 	private ServiceConnection connection;
+	private Button restSetBtn;
+	private EditText rest_interval_edit;
+	private EditText rest_time_edit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +78,9 @@ public class MainActivity extends Activity {
 		saturday = (TextView) findViewById(R.id.sat);
 		sunday = (TextView) findViewById(R.id.sun);
 		sleeptoggleBtn = (ToggleButton) findViewById(R.id.sleep_togglebutton);
+		restSetBtn = (Button)findViewById(R.id.restAlarm_setBtn);
+		rest_interval_edit = (EditText)findViewById(R.id.rest_interval_edit);
+		rest_time_edit = (EditText)findViewById(R.id.rest_time_edit);
 		initClickEvent();
 		
 		bindService();
@@ -139,7 +148,7 @@ public class MainActivity extends Activity {
 				setSleepAlarmCycle(2);
 			}
 		});
-		thursday.setOnClickListener(new OnClickListener() {
+		tuesday.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
@@ -177,6 +186,14 @@ public class MainActivity extends Activity {
 			public void onClick(View v) {
 				saturday.setBackgroundColor(Color.GREEN);
 				setSleepAlarmCycle(7);
+			}
+		});
+		
+		restSetBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				 setRestAlarm();
 			}
 		});
 	}
@@ -253,4 +270,21 @@ public class MainActivity extends Activity {
 			saturday.setBackgroundColor(Color.GREEN);
 		}
 	}
+	
+	//-------------------------------------------
+	
+	private void setRestAlarm(){
+		String intervalTime = rest_interval_edit.getText().toString();
+		String restTime = rest_time_edit.getText().toString();
+		if(intervalTime == null || restTime == null || "".equals(intervalTime) || "".equals(restTime)){
+			Toast.makeText(this, R.string.restset_null_note, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		if("0".equals(intervalTime) || "0".equals(restTime)){
+			Toast.makeText(this, R.string.restset_zero_note, Toast.LENGTH_SHORT).show();
+			return;
+		}
+		mService.setRestAlarm(Integer.parseInt(restTime), Integer.parseInt(intervalTime));
+	}
+	
 }

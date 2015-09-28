@@ -15,4 +15,7 @@
     <string name="rest">休息</string>
     <string name="rest_interval_time">间隔时长</string>
     <string name="rest_time">休息时长</string>
+    <string name="set">设置</string>
+    <string name="restset_null_note">请将设置信息填写完整!</string>
+    <string name="restset_zero_note">设置不能为0!</string>
 </resources>

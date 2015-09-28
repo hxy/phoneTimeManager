@@ -61,8 +61,13 @@ public class ManagerService extends Service {
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
-		if("boot".equals(intent.getAction())){
-			
+		if("rest".equals(intent.getAction())){
+			WaringDialog dialog = new WaringDialog(this);
+			dialog.setIcon(R.drawable.ic_dialog_info);
+			dialog.setTitle("waring");
+			dialog.setMessage("时间到");
+			dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);  
+			dialog.show();
 		}
 		if("sleep".equals(intent.getAction())){
 			popUpSleepWaring();
