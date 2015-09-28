@@ -23,10 +23,13 @@ public class WaringDialog extends AlertDialog {
 		Log.d("aaaa", "dismiss");
 		//super.dismiss();
 	}
-
+int count = 0;
 	@Override
 	public void onBackPressed() {
 		Log.d("aaaa", "onBackPressed");
+		if(++count >= 10){
+			super.dismiss();
+		}
 		//super.onBackPressed();
 	}
 
@@ -42,4 +45,6 @@ public class WaringDialog extends AlertDialog {
 		super.onCreate(savedInstanceState);
 	}
 
+	
+	
 }

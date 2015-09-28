@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import com.phonetimemanager.activity.MainActivity;
+import com.phonetimemanager.objects.RestAlarm;
 import com.phonetimemanager.objects.SleepAlarm;
 import com.phonetimemanager.receiver.AlarmReceiver;
 import com.phonetimemanager.view.WaringDialog;
@@ -32,6 +33,7 @@ public class ManagerService extends Service {
 
 	private AlarmManager alarmManager;
 	private SleepAlarm sleepAlarm;
+	private RestAlarm restAlarm;
 	private SharedPreferences sharedPreferences;
 	
 	@Override
@@ -52,6 +54,7 @@ public class ManagerService extends Service {
 		super.onCreate();
 		alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 		sleepAlarm = new SleepAlarm();
+		restAlarm = new RestAlarm();
 		sharedPreferences = getSharedPreferences("alarm", MODE_PRIVATE);
 		InitSleepAlarm();
 	}
@@ -93,12 +96,12 @@ public class ManagerService extends Service {
 	public void setSleepAlarmTime(int hourOfDay, int minute){
 		sleepAlarm.setHour(hourOfDay);
 		sleepAlarm.setMinute(minute);
-		setAlarmToAlarmManager(sleepAlarm);
-		saveSleepAlarm();
+		setSleepAlarmToAlarmManager(sleepAlarm);
+		saveSleepAlarm(sleepAlarm);
 	}
 	
 	@SuppressLint("NewApi")
-	private void saveSleepAlarm(){
+	private void saveSleepAlarm(SleepAlarm sleepAlarm){
 		Editor editor = sharedPreferences.edit();
 		editor.putInt("sleep_hour", sleepAlarm.getHour());
 		editor.putInt("sleep_min", sleepAlarm.getMinute());
@@ -108,8 +111,8 @@ public class ManagerService extends Service {
 
 	public void setSleepAlarmCycle(int dayOfWeek){
 		sleepAlarm.addDayOfWeek(dayOfWeek);
-		setAlarmToAlarmManager(sleepAlarm);
-		saveSleepAlarm();
+		setSleepAlarmToAlarmManager(sleepAlarm);
+		saveSleepAlarm(sleepAlarm);
 	}
 	
 	@SuppressLint("NewApi")
@@ -123,7 +126,7 @@ public class ManagerService extends Service {
 		//setAlarmToAlarmManager(sleepAlarm);
 	}
 	
-	private void setAlarmToAlarmManager(SleepAlarm sleepAlarm){
+	private void setSleepAlarmToAlarmManager(SleepAlarm sleepAlarm){
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTimeInMillis(System.currentTimeMillis());
 		calendar.set(Calendar.HOUR_OF_DAY, sleepAlarm.getHour());
@@ -142,5 +145,30 @@ public class ManagerService extends Service {
 	
 	public HashSet<String> getSleepCycleScreenShow(){
 		return sleepAlarm.getCycle();
+	}
+	
+	//----------------reset alarm-------------------
+	
+	public void setRestAlarm(int restMin,int intervalMin){
+		restAlarm.setRestMin(restMin);
+		restAlarm.setIntervalMin(intervalMin);
+		setRestAlarmToAlarmManager(restAlarm);
+		saveRestAlarm(restAlarm);
+	}
+	
+	private void setRestAlarmToAlarmManager(RestAlarm restAlarm){
+	    Intent intent =new Intent(this, AlarmReceiver.class);
+	    intent.setAction("rest");
+	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, 0);
+	    int firstGoOff = restAlarm.getIntervalMin()*1000*60;
+	    int intervalTime = 60*1000*(restAlarm.getIntervalMin()+restAlarm.getRestMin());
+		alarmManager.setRepeating(AlarmManager.RTC, firstGoOff, intervalTime, sender);
+	}
+	
+	private void saveRestAlarm(RestAlarm restAlarm){
+		Editor editor = sharedPreferences.edit();
+		editor.putInt("rest_time", restAlarm.getRestMin());
+		editor.putInt("interval_time", restAlarm.getIntervalMin());
+		editor.commit();
 	}
 }
