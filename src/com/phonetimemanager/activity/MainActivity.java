@@ -5,6 +5,7 @@ import java.util.Calendar;
 import java.util.HashSet;
 
 import com.phonetimemanager.R;
+import com.phonetimemanager.objects.RestAlarm;
 import com.phonetimemanager.objects.SleepAlarm;
 import com.phonetimemanager.receiver.AlarmReceiver;
 import com.phonetimemanager.service.ManagerService;
@@ -53,19 +54,20 @@ public class MainActivity extends Activity {
 	private TextView saturday;
 	private TextView sunday;
 	private TimePickerDialog tpd;
-	private AlarmManager alarmManager;
-	private SleepAlarm sleepAlarm;
 	private ServiceConnection connection;
 	private Button restSetBtn;
 	private EditText rest_interval_edit;
 	private EditText rest_time_edit;
+	private Button sleepSetBtn;
+	
+	private int sleepAlarm_hour = 23;
+	private int sleepAlarm_min = 0;
+	private HashSet<String> sleepCycleSet = new HashSet<String>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-		sleepAlarm = new SleepAlarm();
 
 		sleepLayout = (LinearLayout) findViewById(R.id.sleep_layout);
 		sleep_time = (TextView) findViewById(R.id.sleep_time);
@@ -81,6 +83,7 @@ public class MainActivity extends Activity {
 		restSetBtn = (Button)findViewById(R.id.restAlarm_setBtn);
 		rest_interval_edit = (EditText)findViewById(R.id.rest_interval_edit);
 		rest_time_edit = (EditText)findViewById(R.id.rest_time_edit);
+		sleepSetBtn = (Button)findViewById(R.id.sleepAlarm_setBtn);
 		initClickEvent();
 		
 		bindService();
@@ -99,7 +102,7 @@ public class MainActivity extends Activity {
 			public void onServiceConnected(ComponentName name, IBinder service) {
 				mService = ((MyBinder) service).getMyService();
 				initSleepTimeShow();
-				initSleepCycleShow();
+				initRestAlarmShow();
 			}
 		};
 
@@ -127,6 +130,7 @@ public class MainActivity extends Activity {
 				if (tpd == null) {
 					initSleepTimePickerDialog();
 				}
+				tpd.updateTime(sleepAlarm_hour, sleepAlarm_min);
 				tpd.show();
 			}
 		});
@@ -136,7 +140,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				sunday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(1);
+//				setSleepAlarmCycle(1);
+				sleepCycleSet.add("1");
 			}
 		});
 		
@@ -145,7 +150,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				monday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(2);
+//				setSleepAlarmCycle(2);
+				sleepCycleSet.add("2");
 			}
 		});
 		tuesday.setOnClickListener(new OnClickListener() {
@@ -153,7 +159,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				tuesday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(3);
+//				setSleepAlarmCycle(3);
+				sleepCycleSet.add("3");
 			}
 		});
 		wednesday.setOnClickListener(new OnClickListener() {
@@ -161,7 +168,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				wednesday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(4);
+//				setSleepAlarmCycle(4);
+				sleepCycleSet.add("4");
 			}
 		});
 		thursday.setOnClickListener(new OnClickListener() {
@@ -169,7 +177,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				thursday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(5);
+//				setSleepAlarmCycle(5);
+				sleepCycleSet.add("5");
 			}
 		});
 		friday.setOnClickListener(new OnClickListener() {
@@ -177,7 +186,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				friday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(6);
+//				setSleepAlarmCycle(6);
+				sleepCycleSet.add("6");
 			}
 		});
 		saturday.setOnClickListener(new OnClickListener() {
@@ -185,7 +195,8 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				saturday.setBackgroundColor(Color.GREEN);
-				setSleepAlarmCycle(7);
+//				setSleepAlarmCycle(7);
+				sleepCycleSet.add("7");
 			}
 		});
 		
@@ -194,6 +205,14 @@ public class MainActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				 setRestAlarm();
+			}
+		});
+		
+		sleepSetBtn.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				setSleepAlarm(sleepAlarm_hour,sleepAlarm_min,sleepCycleSet);
 			}
 		});
 	}
@@ -213,13 +232,17 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-				setSleepAlarm(hourOfDay, minute);
+				sleepAlarm_hour = hourOfDay;
+				sleepAlarm_min = minute;
 			}
 		}, 23, 0, true);
 	}
 
-	private void setSleepAlarm(int hourOfDay, int minute) {
-		Log.d("aaaa", "activity.setSleepAlarm");
+	private void setSleepAlarm(int hourOfDay, int minute,HashSet<String> sleepCycleSet) {
+		if(sleepCycleSet.isEmpty()){
+			Toast.makeText(this,R.string.sleepset_noweek_note, Toast.LENGTH_SHORT).show();
+			return;
+		}
 		String hour = hourOfDay + "";
 		String min = minute + "";
 		if (hourOfDay < 10) {
@@ -229,11 +252,7 @@ public class MainActivity extends Activity {
 			min = "0" + minute;
 		}
 		sleep_time.setText(hour + ":" + min);
-		mService.setSleepAlarmTime(hourOfDay, minute);
-	}
-
-	private void setSleepAlarmCycle(int dayOfWeek) {
-		mService.setSleepAlarmCycle(dayOfWeek);
+		mService.setSleepAlarmTime(hourOfDay, minute,sleepCycleSet);
 	}
 
 	@Override
@@ -243,11 +262,11 @@ public class MainActivity extends Activity {
 	}
 	
 	private void initSleepTimeShow(){
-		sleep_time.setText(mService.getSleepTimeScreenShow());
-	}
-
-	private void initSleepCycleShow(){
-		HashSet<String> cycleSet = mService.getSleepCycleScreenShow();
+		SleepAlarm sleepAlarm = mService.getSleepAlarm();
+		sleepAlarm_hour = sleepAlarm.getHour();
+		sleepAlarm_min = sleepAlarm.getMinute();
+		sleep_time.setText(sleepAlarm.getHourString()+":"+sleepAlarm.getMinuteString());
+		HashSet<String> cycleSet = sleepAlarm.getCycle();
 		if(cycleSet.contains("1")){
 			sunday.setBackgroundColor(Color.GREEN);
 		}
@@ -285,6 +304,12 @@ public class MainActivity extends Activity {
 			return;
 		}
 		mService.setRestAlarm(Integer.parseInt(restTime), Integer.parseInt(intervalTime));
+		Toast.makeText(this, "设置每隔"+intervalTime+"分钟"+"休息"+restTime+"分钟", Toast.LENGTH_SHORT).show();
 	}
 	
+	private void initRestAlarmShow(){
+		RestAlarm restAlarm = mService.getSavedRestAlarm();
+		rest_interval_edit.setText(restAlarm.getIntervalMin()+"");
+		rest_time_edit.setText(restAlarm.getRestMin()+"");
+	}
 }

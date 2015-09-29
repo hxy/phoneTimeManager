@@ -114,6 +114,11 @@
                 android:textSize="@dimen/sleep_cycle_textsize" />
         </LinearLayout>
         </LinearLayout>
+           <Button 
+            android:id="@+id/sleepAlarm_setBtn"
+            android:layout_width="100dp"
+            android:layout_height="60dp"
+            android:text="@string/set"/>
     </LinearLayout>
 
     <View

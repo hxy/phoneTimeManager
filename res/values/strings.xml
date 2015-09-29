@@ -18,4 +18,5 @@
     <string name="set">设置</string>
     <string name="restset_null_note">请将设置信息填写完整!</string>
     <string name="restset_zero_note">设置不能为0!</string>
+    <string name="sleepset_noweek_note">星期不能为空!</string>
 </resources>

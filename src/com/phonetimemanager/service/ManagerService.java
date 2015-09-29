@@ -56,7 +56,8 @@ public class ManagerService extends Service {
 		sleepAlarm = new SleepAlarm();
 		restAlarm = new RestAlarm();
 		sharedPreferences = getSharedPreferences("alarm", MODE_PRIVATE);
-		InitSleepAlarm();
+		initSleepAlarm();
+		initRestAlarm();
 	}
 
 	@Override
@@ -64,7 +65,7 @@ public class ManagerService extends Service {
 		if("rest".equals(intent.getAction())){
 			WaringDialog dialog = new WaringDialog(this);
 			dialog.setIcon(R.drawable.ic_dialog_info);
-			dialog.setTitle("waring");
+			dialog.setTitle("rest waring");
 			dialog.setMessage("时间到");
 			dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);  
 			dialog.show();
@@ -81,7 +82,7 @@ public class ManagerService extends Service {
 		}
 		WaringDialog dialog = new WaringDialog(this);
 		dialog.setIcon(R.drawable.ic_dialog_info);
-		dialog.setTitle("waring");
+		dialog.setTitle("sleep waring");
 		dialog.setMessage("时间到");
 		dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);  
 		dialog.show();
@@ -98,9 +99,10 @@ public class ManagerService extends Service {
         return true;
 	}
 	
-	public void setSleepAlarmTime(int hourOfDay, int minute){
+	public void setSleepAlarmTime(int hourOfDay, int minute,HashSet<String> sleepCycleSet){
 		sleepAlarm.setHour(hourOfDay);
 		sleepAlarm.setMinute(minute);
+		sleepAlarm.setCycle(sleepCycleSet);
 		setSleepAlarmToAlarmManager(sleepAlarm);
 		saveSleepAlarm(sleepAlarm);
 	}
@@ -113,22 +115,16 @@ public class ManagerService extends Service {
 		editor.putStringSet("sleep_cycle", sleepAlarm.getCycle());
 		editor.commit();
 	}
-
-	public void setSleepAlarmCycle(int dayOfWeek){
-		sleepAlarm.addDayOfWeek(dayOfWeek);
-		setSleepAlarmToAlarmManager(sleepAlarm);
-		saveSleepAlarm(sleepAlarm);
-	}
 	
 	@SuppressLint("NewApi")
-	private void InitSleepAlarm(){
+	private void initSleepAlarm(){
 		if(sharedPreferences.getAll().isEmpty()){
 			return;
 		}
 		sleepAlarm.setHour(sharedPreferences.getInt("sleep_hour", 23));
 		sleepAlarm.setMinute(sharedPreferences.getInt("sleep_min", 0));
 		sleepAlarm.setCycle((HashSet<String>)sharedPreferences.getStringSet("sleep_cycle", null));
-		//setAlarmToAlarmManager(sleepAlarm);
+		setSleepAlarmToAlarmManager(sleepAlarm);
 	}
 	
 	private void setSleepAlarmToAlarmManager(SleepAlarm sleepAlarm){
@@ -143,13 +139,19 @@ public class ManagerService extends Service {
 		alarmManager.set(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), sender);
 	}
 	
-	public String getSleepTimeScreenShow(){
-		String sleepTime = sleepAlarm.getHourString()+":"+sleepAlarm.getMinuteString();
-		return sleepTime;
+	public SleepAlarm getSleepAlarm(){
+		return sleepAlarm;
 	}
 	
 	public HashSet<String> getSleepCycleScreenShow(){
 		return sleepAlarm.getCycle();
+	}
+	
+	private void cancleSleepAlarm(){
+	    Intent intent =new Intent(this, AlarmReceiver.class);
+	    intent.setAction("sleep");
+	    PendingIntent sender=PendingIntent.getBroadcast(this, 0, intent, 0);
+	    alarmManager.cancel(sender);
 	}
 	
 	//----------------reset alarm-------------------
@@ -164,9 +166,11 @@ public class ManagerService extends Service {
 	private void setRestAlarmToAlarmManager(RestAlarm restAlarm){
 	    Intent intent =new Intent(this, AlarmReceiver.class);
 	    intent.setAction("rest");
-	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, 0);
-	    int firstGoOff = restAlarm.getIntervalMin()*1000*60;
-	    int intervalTime = 60*1000*(restAlarm.getIntervalMin()+restAlarm.getRestMin());
+	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    long firstGoOff = System.currentTimeMillis()+restAlarm.getIntervalMin()*1000*60;
+	    long intervalTime = 60*1000*(restAlarm.getIntervalMin()+restAlarm.getRestMin());
+		Log.d("aaaa", "firstGoOff:"+firstGoOff);
+		Log.d("aaaa", "intervalTime:"+intervalTime);
 		alarmManager.setRepeating(AlarmManager.RTC, firstGoOff, intervalTime, sender);
 	}
 	
@@ -175,5 +179,18 @@ public class ManagerService extends Service {
 		editor.putInt("rest_time", restAlarm.getRestMin());
 		editor.putInt("interval_time", restAlarm.getIntervalMin());
 		editor.commit();
+	}
+	
+	private void initRestAlarm(){
+		if(sharedPreferences.getAll().isEmpty()){
+			return;
+		}
+		restAlarm.setRestMin(sharedPreferences.getInt("rest_time", 1));
+		restAlarm.setIntervalMin(sharedPreferences.getInt("interval_time", 2));
+		setRestAlarmToAlarmManager(restAlarm);
+	}
+	
+	public RestAlarm getSavedRestAlarm(){
+		return restAlarm;
 	}
 }
