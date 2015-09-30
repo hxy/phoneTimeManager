@@ -4,7 +4,7 @@ public class RestAlarm {
 
 	private int restMin;
 	private int intervalMin;
-	
+	private boolean status = false;
 	
 	public int getRestMin() {
 		return restMin;
@@ -18,6 +18,10 @@ public class RestAlarm {
 	public void setIntervalMin(int intervalMin) {
 		this.intervalMin = intervalMin;
 	}
-	
-	
+	public boolean getStatus() {
+		return status;
+	}
+	public void setStatus(boolean status) {
+		this.status = status;
+	}
 }

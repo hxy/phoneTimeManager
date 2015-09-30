@@ -7,7 +7,7 @@ public class SleepAlarm {
 	private int hour;
 	private int minute;
 	private HashSet<String> cycle = new HashSet<String>();
-	
+	private boolean status = false;
 	
 	public void addDayOfWeek(int dayOfWeek){
 		cycle.add(dayOfWeek+"");
@@ -49,5 +49,12 @@ public class SleepAlarm {
 			return "0"+minute;
 		}
 		return minute+"";
+	}
+
+	public boolean getStatus() {
+		return status;
+	}
+	public void setStatus(boolean status) {
+		this.status = status;
 	}
 }

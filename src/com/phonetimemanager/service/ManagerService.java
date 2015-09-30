@@ -35,7 +35,7 @@ public class ManagerService extends Service {
 	private SleepAlarm sleepAlarm;
 	private RestAlarm restAlarm;
 	private SharedPreferences sharedPreferences;
-	
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -100,6 +100,8 @@ public class ManagerService extends Service {
 	}
 	
 	public void setSleepAlarmTime(int hourOfDay, int minute,HashSet<String> sleepCycleSet){
+		Log.d("aaaa", "setSleepAlarmTime--sleepAlarm.setStatus(true);");
+		sleepAlarm.setStatus(true);
 		sleepAlarm.setHour(hourOfDay);
 		sleepAlarm.setMinute(minute);
 		sleepAlarm.setCycle(sleepCycleSet);
@@ -110,6 +112,7 @@ public class ManagerService extends Service {
 	@SuppressLint("NewApi")
 	private void saveSleepAlarm(SleepAlarm sleepAlarm){
 		Editor editor = sharedPreferences.edit();
+		editor.putBoolean("sleep_status", sleepAlarm.getStatus());
 		editor.putInt("sleep_hour", sleepAlarm.getHour());
 		editor.putInt("sleep_min", sleepAlarm.getMinute());
 		editor.putStringSet("sleep_cycle", sleepAlarm.getCycle());
@@ -118,13 +121,14 @@ public class ManagerService extends Service {
 	
 	@SuppressLint("NewApi")
 	private void initSleepAlarm(){
-		if(sharedPreferences.getAll().isEmpty()){
-			return;
-		}
+		sleepAlarm.setStatus(sharedPreferences.getBoolean("sleep_status", false));
+		Log.d("aaaa", "initSleepAlarm--sleepAlarm.getStatus:"+sleepAlarm.getStatus());
 		sleepAlarm.setHour(sharedPreferences.getInt("sleep_hour", 23));
 		sleepAlarm.setMinute(sharedPreferences.getInt("sleep_min", 0));
 		sleepAlarm.setCycle((HashSet<String>)sharedPreferences.getStringSet("sleep_cycle", null));
-		setSleepAlarmToAlarmManager(sleepAlarm);
+		if(sleepAlarm.getStatus()){
+			//setSleepAlarmToAlarmManager(sleepAlarm);
+		}
 	}
 	
 	private void setSleepAlarmToAlarmManager(SleepAlarm sleepAlarm){
@@ -143,20 +147,20 @@ public class ManagerService extends Service {
 		return sleepAlarm;
 	}
 	
-	public HashSet<String> getSleepCycleScreenShow(){
-		return sleepAlarm.getCycle();
-	}
-	
-	private void cancleSleepAlarm(){
+	public void cancleSleepAlarm(){
 	    Intent intent =new Intent(this, AlarmReceiver.class);
 	    intent.setAction("sleep");
 	    PendingIntent sender=PendingIntent.getBroadcast(this, 0, intent, 0);
 	    alarmManager.cancel(sender);
+	    
+	    sleepAlarm.setStatus(false);
+	    saveSleepAlarm(sleepAlarm);
 	}
 	
 	//----------------reset alarm-------------------
 	
 	public void setRestAlarm(int restMin,int intervalMin){
+		restAlarm.setStatus(true);
 		restAlarm.setRestMin(restMin);
 		restAlarm.setIntervalMin(intervalMin);
 		setRestAlarmToAlarmManager(restAlarm);
@@ -169,28 +173,40 @@ public class ManagerService extends Service {
 	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    long firstGoOff = System.currentTimeMillis()+restAlarm.getIntervalMin()*1000*60;
 	    long intervalTime = 60*1000*(restAlarm.getIntervalMin()+restAlarm.getRestMin());
-		Log.d("aaaa", "firstGoOff:"+firstGoOff);
-		Log.d("aaaa", "intervalTime:"+intervalTime);
 		alarmManager.setRepeating(AlarmManager.RTC, firstGoOff, intervalTime, sender);
 	}
 	
 	private void saveRestAlarm(RestAlarm restAlarm){
 		Editor editor = sharedPreferences.edit();
+		editor.putBoolean("rest_status",restAlarm.getStatus());
 		editor.putInt("rest_time", restAlarm.getRestMin());
 		editor.putInt("interval_time", restAlarm.getIntervalMin());
 		editor.commit();
 	}
 	
 	private void initRestAlarm(){
-		if(sharedPreferences.getAll().isEmpty()){
-			return;
-		}
+//		if(sharedPreferences.getAll().isEmpty()){
+//			return;
+//		}
+		restAlarm.setStatus(sharedPreferences.getBoolean("rest_status", false));
 		restAlarm.setRestMin(sharedPreferences.getInt("rest_time", 1));
 		restAlarm.setIntervalMin(sharedPreferences.getInt("interval_time", 2));
-		setRestAlarmToAlarmManager(restAlarm);
+		if(restAlarm.getStatus()){
+			//setRestAlarmToAlarmManager(restAlarm);
+		}
 	}
 	
 	public RestAlarm getSavedRestAlarm(){
 		return restAlarm;
+	}
+	
+	public void cancleRestAlarm(){
+	    Intent intent =new Intent(this, AlarmReceiver.class);
+	    intent.setAction("rest");
+	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    alarmManager.cancel(sender);
+	    
+	    restAlarm.setStatus(false);
+	    saveRestAlarm(restAlarm);
 	}
 }

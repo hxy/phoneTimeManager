@@ -18,5 +18,7 @@
     <string name="set">设置</string>
     <string name="restset_null_note">请将设置信息填写完整!</string>
     <string name="restset_zero_note">设置不能为0!</string>
-    <string name="sleepset_noweek_note">星期不能为空!</string>
+    <string name="sleepset_noweek_note">星期不能为空!请选择星期并点击设置键设置提醒</string>
+    <string name="sleep_set_successful">睡眠模式设置成功</string>
+    <string name="rest_set_successful">休息模式设置成功</string>
 </resources>
