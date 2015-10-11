@@ -9,7 +9,8 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="com.phonetimemanager.activity.MainActivity" >
+    tools:context="com.phonetimemanager.activity.MainActivity" 
+    android:background="#6C7B8B">
 
     <android.support.percent.PercentLinearLayout
         android:id="@+id/sleep_layout"
@@ -49,15 +50,17 @@
                 android:id="@+id/sleep_seter_layout"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" >
+                android:orientation="vertical" 
+                android:background="@drawable/sleep5">
 
                 <TextView
                     android:id="@+id/sleep_time"
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
-                    app:layout_heightPercent="30%"
+                    app:layout_heightPercent="50%"
                     android:gravity="center"
-                    android:textSize="@dimen/sleep_time_textsize" />
+                    android:textSize="@dimen/sleep_time_textsize" 
+                    android:textColor="#fff"/>
 
                 <android.support.percent.PercentLinearLayout
                     android:id="@+id/sleep_cycleLayout"
@@ -74,7 +77,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/monday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize" 
+                        android:textColor="#fff"/>
 
                     <TextView
                         android:id="@+id/tue"
@@ -83,7 +87,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/tuesday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize"
+                        android:textColor="#fff" />
 
                     <TextView
                         android:id="@+id/wed"
@@ -92,7 +97,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/wednesday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize" 
+                        android:textColor="#fff"/>
 
                     <TextView
                         android:id="@+id/thu"
@@ -101,7 +107,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/thursday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize" 
+                        android:textColor="#fff"/>
 
                     <TextView
                         android:id="@+id/fri"
@@ -110,7 +117,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/friday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize" 
+                        android:textColor="#fff"/>
 
                     <TextView
                         android:id="@+id/sat"
@@ -119,7 +127,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/saturday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize" 
+                        android:textColor="#fff"/>
 
                     <TextView
                         android:id="@+id/sun"
@@ -128,7 +137,8 @@
                         app:layout_widthPercent="14%"
                         android:gravity="center"
                         android:text="@string/sunday"
-                        android:textSize="@dimen/sleep_cycle_textsize" />
+                        android:textSize="@dimen/sleep_cycle_textsize"
+                        android:textColor="#fff" />
                 </android.support.percent.PercentLinearLayout>
 
                 <Button
@@ -136,8 +146,8 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
-                    app:layout_heightPercent="15%"
-                    app:layout_marginTopPercent="15%"
+                    app:layout_heightPercent="20%"
+                    app:layout_marginTopPercent="10%"
                     app:layout_widthPercent="20%"
                     android:text="@string/set" />
             </android.support.percent.PercentLinearLayout>
@@ -146,7 +156,7 @@
                 android:id="@+id/sleep_cover"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:background="#5555"
+                android:background="#8555"
                 android:clickable="true" />
         </RelativeLayout>
     </android.support.percent.PercentLinearLayout>
@@ -162,7 +172,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_heightPercent="48%"
-        android:orientation="vertical" >
+        android:orientation="vertical">
 
         <RelativeLayout
             android:id="@+id/rest_title"
@@ -218,7 +228,7 @@
                         app:layout_widthPercent="30%"
                         android:orientation="horizontal" >
 
-                        <EditText
+                        <com.phonetimemanager.view.SelectedEditText
                             android:id="@+id/rest_interval_edit"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -260,7 +270,7 @@
                         app:layout_widthPercent="30%"
                         android:orientation="horizontal" >
 
-                        <EditText
+                        <com.phonetimemanager.view.SelectedEditText
                             android:id="@+id/rest_time_edit"
                             android:layout_width="0dp"
                             android:layout_height="match_parent"
@@ -286,7 +296,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:layout_gravity="center_horizontal"
-                    app:layout_heightPercent="15%"
+                    app:layout_heightPercent="20%"
                     app:layout_marginTopPercent="15%"
                     app:layout_widthPercent="20%"
                     android:text="@string/set" />

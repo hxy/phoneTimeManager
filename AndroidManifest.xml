@@ -13,12 +13,12 @@
 
     <application
         android:allowBackup="true"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/phonetimemanager"
         android:label="@string/app_name" >
         <activity
             android:name="com.phonetimemanager.activity.MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode = "adjustPan">
+            android:windowSoftInputMode="adjustPan" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -26,7 +26,9 @@
             </intent-filter>
         </activity>
 
-        <service android:name="com.phonetimemanager.service.ManagerService" />
+        <service
+            android:name="com.phonetimemanager.service.ManagerService"
+            android:priority="1000" />
 
         <receiver android:name="com.phonetimemanager.receiver.AlarmReceiver" />
         <receiver android:name="com.phonetimemanager.receiver.BootReceiver" >

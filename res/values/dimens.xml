@@ -4,7 +4,7 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="title_textsize">18sp</dimen>
-    <dimen name="sleep_time_textsize">50sp</dimen>
+    <dimen name="sleep_time_textsize">80sp</dimen>
     <dimen name="sleep_cycle_textsize">20sp</dimen>
     <dimen name="sleep_time_marginTop">20dp</dimen>
     <dimen name="sleep_cycle_marginTop">20dp</dimen>

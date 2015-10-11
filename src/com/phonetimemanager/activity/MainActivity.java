@@ -10,6 +10,7 @@ import com.phonetimemanager.objects.SleepAlarm;
 import com.phonetimemanager.receiver.AlarmReceiver;
 import com.phonetimemanager.service.ManagerService;
 import com.phonetimemanager.service.ManagerService.MyBinder;
+import com.phonetimemanager.view.SelectedEditText;
 import com.zcw.togglebutton.ToggleButton;
 import com.zcw.togglebutton.ToggleButton.OnToggleChanged;
 
@@ -55,8 +56,8 @@ public class MainActivity extends Activity {
 	private TimePickerDialog tpd;
 	private ServiceConnection connection;
 	private Button restSetBtn;
-	private EditText rest_interval_edit;
-	private EditText rest_time_edit;
+	private SelectedEditText rest_interval_edit;
+	private SelectedEditText rest_time_edit;
 	private Button sleepSetBtn;
 	private View sleep_cover;
 	private View rest_cover;
@@ -80,15 +81,14 @@ public class MainActivity extends Activity {
 		sunday = (TextView) findViewById(R.id.sun);
 		sleeptoggleBtn = (ToggleButton) findViewById(R.id.sleep_togglebutton);
 		restSetBtn = (Button)findViewById(R.id.restAlarm_setBtn);
-		rest_interval_edit = (EditText)findViewById(R.id.rest_interval_edit);
-		rest_time_edit = (EditText)findViewById(R.id.rest_time_edit);
+		rest_interval_edit = (SelectedEditText)findViewById(R.id.rest_interval_edit);
+		rest_time_edit = (SelectedEditText)findViewById(R.id.rest_time_edit);
 		sleepSetBtn = (Button)findViewById(R.id.sleepAlarm_setBtn);
 		resttoggleBtn = (ToggleButton)findViewById(R.id.rest_togglebutton);
 		sleep_cover = (View)findViewById(R.id.sleep_cover);
 		rest_cover = (View)findViewById(R.id.rest_cover);
 		
 		initClickEvent();
-		
 		bindService();
 	}
 
@@ -218,41 +218,14 @@ public class MainActivity extends Activity {
 				setSleepAlarm(sleepAlarm_hour,sleepAlarm_min,sleepCycleSet);
 			}
 		});
-		
-//		rest_interval_edit.setOnClickListener(new OnClickListener() {
-//			
-//			@Override
-//			public void onClick(View v) {
-//				Log.d("aaaa", "onclick");
-//				rest_interval_edit.selectAll();
-//			}
-//		});
-
-		rest_interval_edit.setOnFocusChangeListener(new OnFocusChangeListener() {
-			
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				Log.d("aaaa", "interval_hasFocus:"+hasFocus);
-				if(hasFocus)
-				rest_interval_edit.selectAll();
-			}
-		});
-		rest_time_edit.setOnClickListener(new OnClickListener() {
-			
-			@Override
-			public void onClick(View v) {
-				Log.d("aaaa", "onclick");
-				rest_time_edit.selectAll();
-			}
-		});
 	}
 
 	private void addOrRemoveWeekDay(View v,String day){
 		if(sleepCycleSet.contains(day)){
-			v.setBackgroundColor(Color.TRANSPARENT);
+			((TextView)v).setTextColor(Color.WHITE);
 			sleepCycleSet.remove(day);
 		}else {
-			v.setBackgroundColor(Color.GREEN);
+			((TextView)v).setTextColor(Color.GREEN);
 			sleepCycleSet.add(day);
 		}
 	}
@@ -284,15 +257,12 @@ public class MainActivity extends Activity {
 			public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
 				sleepAlarm_hour = hourOfDay;
 				sleepAlarm_min = minute;
+				updateTimeView(hourOfDay,minute);
 			}
 		}, 23, 0, true);
 	}
 
-	private void setSleepAlarm(int hourOfDay, int minute,HashSet<String> sleepCycleSet) {
-		if(sleepCycleSet.isEmpty()){
-			Toast.makeText(this,R.string.sleepset_noweek_note, Toast.LENGTH_SHORT).show();
-			return;
-		}
+	private void updateTimeView(int hourOfDay,int minute){
 		String hour = hourOfDay + "";
 		String min = minute + "";
 		if (hourOfDay < 10) {
@@ -302,6 +272,14 @@ public class MainActivity extends Activity {
 			min = "0" + minute;
 		}
 		sleep_time.setText(hour + ":" + min);
+	}
+	
+	private void setSleepAlarm(int hourOfDay, int minute,HashSet<String> sleepCycleSet) {
+		if(sleepCycleSet.isEmpty()){
+			Toast.makeText(this,R.string.sleepset_noweek_note, Toast.LENGTH_SHORT).show();
+			return;
+		}
+
 		mService.setSleepAlarmTime(hourOfDay, minute,sleepCycleSet);
 		Toast.makeText(this,R.string.sleep_set_successful, Toast.LENGTH_SHORT).show();
 	}
@@ -321,25 +299,25 @@ public class MainActivity extends Activity {
 		sleep_time.setText(sleepAlarm.getHourString()+":"+sleepAlarm.getMinuteString());
 		HashSet<String> cycleSet = sleepAlarm.getCycle();
 		if(cycleSet.contains("1")){
-			sunday.setBackgroundColor(Color.GREEN);
+			sunday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("2")){
-			monday.setBackgroundColor(Color.GREEN);
+			monday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("3")){
-			tuesday.setBackgroundColor(Color.GREEN);
+			tuesday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("4")){
-			wednesday.setBackgroundColor(Color.GREEN);
+			wednesday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("5")){
-			thursday.setBackgroundColor(Color.GREEN);
+			thursday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("6")){
-			friday.setBackgroundColor(Color.GREEN);
+			friday.setTextColor(Color.GREEN);
 		}
 		if(cycleSet.contains("7")){
-			saturday.setBackgroundColor(Color.GREEN);
+			saturday.setTextColor(Color.GREEN);
 		}
 		
 		if(sleepAlarm.getStatus()){

@@ -9,32 +9,44 @@ import com.phonetimemanager.activity.MainActivity;
 import com.phonetimemanager.objects.RestAlarm;
 import com.phonetimemanager.objects.SleepAlarm;
 import com.phonetimemanager.receiver.AlarmReceiver;
+import com.phonetimemanager.receiver.ScreenStatusReceiver;
+import com.phonetimemanager.view.CountdownDialog;
+import com.phonetimemanager.view.CountdownDialog.DialogStatusInterface;
 import com.phonetimemanager.view.WaringDialog;
 
 import android.R;
 import android.annotation.SuppressLint;
 import android.app.AlarmManager;
+import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.app.TimePickerDialog;
 import android.app.TimePickerDialog.OnTimeSetListener;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.os.Binder;
 import android.os.IBinder;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
-public class ManagerService extends Service {
+public class ManagerService extends Service implements DialogStatusInterface{
 
 	private AlarmManager alarmManager;
 	private SleepAlarm sleepAlarm;
 	private RestAlarm restAlarm;
 	private SharedPreferences sharedPreferences;
+	private boolean isRestDialogShow = false;
+	private ScreenStatusReceiver screenStatusReceiver;
+	private boolean isScreenOn = true;
+	private TelephonyManager telManager;
+	private boolean delayPopup = false;
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -48,42 +60,91 @@ public class ManagerService extends Service {
 		}
 	}
 
+	@Override
+	public void setCountDownDialogStatus(boolean status) {
+		isRestDialogShow = status;
+	}
 
+	@Override
+	public boolean isScreenOn() {
+		return isScreenOn;
+	}
+	
 	@Override
 	public void onCreate() {
 		super.onCreate();
+		Log.d("aaaa", "service oncreate");
+		this.startForeground(0, new Notification());
+		screenStatusReceiver = new ScreenStatusReceiver();
+		telManager = (TelephonyManager)getSystemService(Service.TELEPHONY_SERVICE);
 		alarmManager = (AlarmManager)getSystemService(ALARM_SERVICE);
 		sleepAlarm = new SleepAlarm();
 		restAlarm = new RestAlarm();
 		sharedPreferences = getSharedPreferences("alarm", MODE_PRIVATE);
 		initSleepAlarm();
 		initRestAlarm();
+		
+		registerScreenActionReceiver();
 	}
-
+	CountdownDialog dialog;
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
+		Log.d("aaaa", "service start:"+intent.getAction());
 		if("rest".equals(intent.getAction())){
-			WaringDialog dialog = new WaringDialog(this);
-			dialog.setIcon(R.drawable.ic_dialog_info);
-			dialog.setTitle("rest waring");
-			dialog.setMessage("时间到");
-			dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);  
-			dialog.show();
-		}
-		if("sleep".equals(intent.getAction())){
+			dialog = new CountdownDialog(this,intent.getIntExtra("restMinutes", 0),intent.getIntExtra("intervalMinutes", 0),this);
+			if(telManager.getCallState() == TelephonyManager.CALL_STATE_RINGING || telManager.getCallState() == TelephonyManager.CALL_STATE_OFFHOOK){
+				delayPopup = true;
+			}else{
+				dialog.show();
+			}
+		}else if("sleep".equals(intent.getAction())){
 			popUpSleepWaring();
+		}else if(Intent.ACTION_SCREEN_ON.equals(intent.getAction())){
+			isScreenOn = true;
+			if(!isRestDialogShow){
+				if(restAlarm.getStatus()){
+				   setRestAlarmToAlarmManager(restAlarm);
+				}
+			}
+		}else if(Intent.ACTION_SCREEN_OFF.equals(intent.getAction())){
+			isScreenOn = false;
+			if(!isRestDialogShow){
+				cancleRestAlarmWithOutSave();
+			}
+		}else if("call".equals(intent.getAction())){
+			if(isRestDialogShow){
+				dialog.hide();
+			}
+		}else if ("hangup".equals(intent.getAction())) {
+			if(isRestDialogShow){
+				dialog.resumeShow();
+			}
+			if(delayPopup){
+				dialog.show();
+				delayPopup = false;
+			}
 		}
-		return super.onStartCommand(intent, flags, startId);
+
+		return START_REDELIVER_INTENT;
 	}
 
+	
+	
+	@Override
+	public void onDestroy() {
+		unregisterReceiver(screenStatusReceiver);
+		
+		super.onDestroy();
+	}
+//---------------sleep alarm-----------------
 	public void popUpSleepWaring(){
 		if(!isContainDayOfWeek()){
 			return;
 		}
 		WaringDialog dialog = new WaringDialog(this);
 		dialog.setIcon(R.drawable.ic_dialog_info);
-		dialog.setTitle("sleep waring");
-		dialog.setMessage("时间到");
+		dialog.setTitle("睡觉时间到");
+		dialog.setMessage("少年，该睡觉了");
 		dialog.getWindow().setType(WindowManager.LayoutParams.TYPE_PHONE);  
 		dialog.show();
 	}
@@ -100,7 +161,6 @@ public class ManagerService extends Service {
 	}
 	
 	public void setSleepAlarmTime(int hourOfDay, int minute,HashSet<String> sleepCycleSet){
-		Log.d("aaaa", "setSleepAlarmTime--sleepAlarm.setStatus(true);");
 		sleepAlarm.setStatus(true);
 		sleepAlarm.setHour(hourOfDay);
 		sleepAlarm.setMinute(minute);
@@ -127,7 +187,7 @@ public class ManagerService extends Service {
 		sleepAlarm.setMinute(sharedPreferences.getInt("sleep_min", 0));
 		sleepAlarm.setCycle((HashSet<String>)sharedPreferences.getStringSet("sleep_cycle", null));
 		if(sleepAlarm.getStatus()){
-			//setSleepAlarmToAlarmManager(sleepAlarm);
+			setSleepAlarmToAlarmManager(sleepAlarm);
 		}
 	}
 	
@@ -156,7 +216,7 @@ public class ManagerService extends Service {
 	    sleepAlarm.setStatus(false);
 	    saveSleepAlarm(sleepAlarm);
 	}
-	
+
 	//----------------reset alarm-------------------
 	
 	public void setRestAlarm(int restMin,int intervalMin){
@@ -166,14 +226,15 @@ public class ManagerService extends Service {
 		setRestAlarmToAlarmManager(restAlarm);
 		saveRestAlarm(restAlarm);
 	}
-	
+
 	private void setRestAlarmToAlarmManager(RestAlarm restAlarm){
 	    Intent intent =new Intent(this, AlarmReceiver.class);
 	    intent.setAction("rest");
+	    intent.putExtra("restMinutes", restAlarm.getRestMin());
+	    intent.putExtra("intervalMinutes", restAlarm.getIntervalMin());
 	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    long firstGoOff = System.currentTimeMillis()+restAlarm.getIntervalMin()*1000*60;
-	    long intervalTime = 60*1000*(restAlarm.getIntervalMin()+restAlarm.getRestMin());
-		alarmManager.setRepeating(AlarmManager.RTC, firstGoOff, intervalTime, sender);
+	    alarmManager.set(AlarmManager.RTC, firstGoOff, sender);
 	}
 	
 	private void saveRestAlarm(RestAlarm restAlarm){
@@ -192,7 +253,7 @@ public class ManagerService extends Service {
 		restAlarm.setRestMin(sharedPreferences.getInt("rest_time", 1));
 		restAlarm.setIntervalMin(sharedPreferences.getInt("interval_time", 2));
 		if(restAlarm.getStatus()){
-			//setRestAlarmToAlarmManager(restAlarm);
+			setRestAlarmToAlarmManager(restAlarm);
 		}
 	}
 	
@@ -205,8 +266,27 @@ public class ManagerService extends Service {
 	    intent.setAction("rest");
 	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	    alarmManager.cancel(sender);
-	    
+
 	    restAlarm.setStatus(false);
 	    saveRestAlarm(restAlarm);
 	}
+	
+	private void cancleRestAlarmWithOutSave(){
+	    Intent intent =new Intent(this, AlarmReceiver.class);
+	    intent.setAction("rest");
+	    PendingIntent sender = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+	    alarmManager.cancel(sender);
+	}
+	
+	//——----------------------------------
+	
+
+
+    private void registerScreenActionReceiver(){  
+        final IntentFilter filter = new IntentFilter();  
+        filter.addAction(Intent.ACTION_SCREEN_OFF);  
+        filter.addAction(Intent.ACTION_SCREEN_ON);  
+        registerReceiver(screenStatusReceiver, filter);  
+    }
+
 }
